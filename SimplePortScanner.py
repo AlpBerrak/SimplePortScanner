@@ -15,10 +15,10 @@ def scanPort(targetIP):
     try:
       sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       sock.settimeout(0.5)
-      result = socket.connect_ex((targetIP, port))
+      result = sock.connect_ex((targetIP, port))
       if result == 0:
         with lock:
-          print(f"Port {port}")
+          print(f"Port {port} is OPEN")
         sock.close()
     except Exception as e:
       pass
@@ -49,7 +49,7 @@ def scanner():
   threadCount = 50
   threads = []
   for i in range(threadCount):
-    t = threading.Thread(target=scanPort, args=(targetIP))
+    t = threading.Thread(target=scanPort, args=(targetIP,))
     t.start()
     threads.append(t)
   portQueue.join() # after all ports are scanned
