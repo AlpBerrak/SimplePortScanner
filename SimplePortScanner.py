@@ -19,6 +19,7 @@ def scanPort(targetIP):
       if result == 0:
         with lock:
           print(f"Port {port} is OPEN")
+          openPorts.append(port)
         sock.close()
     except Exception as e:
       pass
