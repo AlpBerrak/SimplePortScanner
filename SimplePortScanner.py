@@ -30,3 +30,6 @@ def scanner():
     sock.close()
   print(f"\nScanning finished at: {datetime.now()}")  
   print(f"Open ports: {openPorts}")
+
+if __name__  == "__main__":
+  scanner()
