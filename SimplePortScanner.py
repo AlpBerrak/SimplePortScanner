@@ -1,9 +1,32 @@
 import socket
 from datetime import datetime
+import threading
+from queue import Queue
+
+# Queue to hold ports to scan
+
+portQueue = Queue()
+openPorts = []
+lock = threading.Lock()
+
+def scanPort(targetIP):
+  while not portQueue.empty():
+    port = portQueue.get()
+    try:
+      sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      sock.settimeout(0.5)
+      result = socket.connect_ex((targetIP, port))
+      if result == 0:
+        with lock:
+          print(f"Port {port}")
+        sock.close()
+    except Exception as e:
+      pass
+    portQueue.task_done()
 
 def scanner():
   # Get target host from user
-  target = input("Enter target IP or hostname")
+  target = input("Enter target IP or hostname: ")
 
   # Resolve hostname to IP if needed
 
@@ -18,18 +41,10 @@ def scanner():
   
   # Scan a range of ports
   # For now ports 1 - 1024
-  openPorts = []
   
   for port in range(1,1025):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket.setdefaulttimeout(0.5)
-    result = sock.connect_ex((targetIP, port))
-    if result == 0:
-      print(f"Port {port} is OPEN")
-      openPorts.append(port)
-    sock.close()
-  print(f"\nScanning finished at: {datetime.now()}")  
-  print(f"Open ports: {openPorts}")
-
+    portQueue.put(port)
+    
+ 
 if __name__  == "__main__":
   scanner()
