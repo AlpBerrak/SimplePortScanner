@@ -18,8 +18,12 @@ def scanPort(targetIP):
       result = sock.connect_ex((targetIP, port))
       if result == 0:
         with lock:
-          print(f"Port {port} is OPEN")
-          openPorts.append(port)
+          try:
+            service = socket.getservbyport(port)
+          except OSError:
+            service = "Unknown"
+          print(f"Port {port} is OPEN ({service})")
+          openPorts.append((port, service))
         sock.close()
     except Exception as e:
       pass
@@ -56,7 +60,9 @@ def scanner():
   portQueue.join() # after all ports are scanned
   
   print(f"\nScanning finished at: {datetime.now()}")
-  print(f"Open ports: {sorted(openPorts)}")
+  print("Open ports and services:")
+  for port, service in sorted(openPorts):
+    print(f"Port {port}: {service}")
  
 if __name__  == "__main__":
   scanner()
