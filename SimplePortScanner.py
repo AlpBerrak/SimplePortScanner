@@ -45,6 +45,17 @@ def scanner():
   for port in range(1,1025):
     portQueue.put(port)
     
+  # Start threads
+  threadCount = 50
+  threads = []
+  for i in range(threadCount):
+    t = threading.Thread(target=scanPort, args=(targetIP))
+    t.start()
+    threads.append(t)
+  portQueue.join() # after all ports are scanned
+  
+  print(f"\nScanning finished at: {datetime.now()}")
+  print(f"Open ports: {sorted(openPorts)}")
  
 if __name__  == "__main__":
   scanner()
